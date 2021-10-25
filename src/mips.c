@@ -30,9 +30,8 @@ int main (int argc, char *args[]) {
 	FILE *fp;
 	fp = fopen("text.hex", "r");
 	unsigned int instruction = 0;
-	size_t index = 0
-	while(fscanf(fp, "%X", &instruction) != EOF){
-		instructionParse(instruction, index);
+	size_t index = 0;
+	while(fscanf(fp, "%X", &instruction) != EOF && !instructionParse(instruction, index)){
 		index++;
 		//printf("%X\n", instruction);
 		}
