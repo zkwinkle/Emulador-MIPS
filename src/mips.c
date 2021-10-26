@@ -5,6 +5,7 @@
 
 #include "bit_manipulation.h"
 #include "MIPS_parser.h"
+#include "MIPS_memory.h"
 #include "text_manager.h"
 
 #define SCREEN_WIDTH 512	//window height
@@ -27,6 +28,7 @@ static SDL_Surface *screen;
 SDL_Texture *screen_texture;
 
 int main (int argc, char *args[]) {
+	init_memory();
 	openText();
 	//jumpToInstruction(0x400b28);
 	while(!readNextInstruction());
@@ -99,6 +101,7 @@ int main (int argc, char *args[]) {
 //	SDL_Quit(); 
 	 
 	closeText();
+	free_memory();
 	return 0;
 	
 }

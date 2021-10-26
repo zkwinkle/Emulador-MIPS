@@ -39,6 +39,7 @@ void free_memory(){
 	free(RB);
 	free(data);
 	free(heap);
+	free(stack);
 	free(MMIO);
 }
 
@@ -49,5 +50,10 @@ void storeInRegister(uint32_t word, int reg){
 }
 
 uint32_t getFromRegister(int reg){
-	
+	if(reg>=32){
+		printf("\n-------------------------\n");
+		printf("Intentando accesar registro no válido '%d'", reg);
+		printf("\n-------------------------\n");
+	}
+	return RB[reg];
 }
