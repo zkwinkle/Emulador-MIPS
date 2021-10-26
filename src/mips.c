@@ -2,10 +2,10 @@
 #include <SDL.h>	//SDL version 2.0
 #include "SDL_helpers.h" //my own code
 #include <stdlib.h>
-#include <stdio.h>
 
 #include "bit_manipulation.h"
 #include "MIPS_parser.h"
+#include "text_manager.h"
 
 #define SCREEN_WIDTH 512	//window height
 #define SCREEN_HEIGHT 256	//window width
@@ -27,14 +27,9 @@ static SDL_Surface *screen;
 SDL_Texture *screen_texture;
 
 int main (int argc, char *args[]) {
-	FILE *fp;
-	fp = fopen("text.hex", "r");
-	unsigned int instruction = 0;
-	size_t index = 0;
-	while(fscanf(fp, "%X", &instruction) != EOF && !instructionParse(instruction, index)){
-		index++;
-		//printf("%X\n", instruction);
-		}
+	openText();
+	//jumpToInstruction(0x400b28);
+	while(!readNextInstruction());
 
 		
 	//SDL stuff disabled
@@ -103,7 +98,7 @@ int main (int argc, char *args[]) {
 //	//Quit SDL subsystems 
 //	SDL_Quit(); 
 	 
-	fclose(fp);
+	closeText();
 	return 0;
 	
 }

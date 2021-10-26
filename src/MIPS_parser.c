@@ -1,4 +1,4 @@
-#include <MIPS_parser.h>
+#include "MIPS_parser.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -209,10 +209,12 @@ int printInstruction(uint32_t instruction, char format, char* name, size_t index
 			int16_t imm = getBitRange(instruction, 16, 0);
 			if(opcode == 0x06 || opcode == 0x07)
 				printf("%s $%s, %d", name, rs, imm);
+			else if(opcode == 0xf)
+				printf("%s $%s, %d", name, rt, imm);
 			else if(opcode == 0x23 || opcode == 0x24 || opcode == 0x25 || opcode == 0x28 || opcode == 0x29 || opcode == 0x2b)
 				printf("%s $%s, %d($%s)", name, rt, imm , rs);
 			else
-				printf("%s, $%s, $%s, $%d", name, rs, rt, imm);
+				printf("%s, $%s, $%s, %d", name, rs, rt, imm);
 			break;
 		case 'J':
 			printf("%s %X", name, getBitRange(instruction, 26, 0));
