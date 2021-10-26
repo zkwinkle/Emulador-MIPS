@@ -217,7 +217,7 @@ int printInstruction(uint32_t instruction, char format, char* name, size_t index
 				printf("%s, $%s, $%s, %d", name, rs, rt, imm);
 			break;
 		case 'J':
-			printf("%s %X", name, getBitRange(instruction, 26, 0));
+			printf("%s 0x%.8X", name, getBitRange(instruction, 26, 0)<<2); // shift left by 2 porque MIPS le corta los últimos 2 0s
 			break;
 	}
 	printf("\n");
