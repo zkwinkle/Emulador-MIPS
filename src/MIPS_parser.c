@@ -13,6 +13,8 @@ int instructionParse(uint32_t instruction, size_t index){
 	//usleep(20000); // pause for 20ms for better visualization
 	char format = 'I'; // I, R or J
 
+	int exe = 1;
+
 	uint32_t opcode = getBitRange(instruction, 32, 26);
 	uint32_t rs = getBitRange(instruction, 26, 21);
 	uint32_t rt = getBitRange(instruction, 21, 16);
@@ -23,7 +25,7 @@ int instructionParse(uint32_t instruction, size_t index){
 	switch(opcode){
 		case 0x0: // tipo R
 			format = 'R';
-			if(RParse(instruction)){
+			if(RParse(instruction, exe)){
 				printf("funct '%X' de instrucción tipo R no reconocido en línea %d",getBitRange(instruction, 6, 0), index);
 				return 1;
 			}
@@ -32,13 +34,15 @@ int instructionParse(uint32_t instruction, size_t index){
 		case 0x8: // addi
 			name = "addi";
 
-			add_imm(rt, rs, immediate);
+			if(exe)
+				add_imm(rt, rs, immediate);
 			break;
 
 		case 0x9: // addiu
 			name = "addiu";
 
-			add_imm_unsigned(rt, rs, immediate);
+			if(exe)
+				add_imm_unsigned(rt, rs, immediate);
 			break;
 
 		//case 0xC: // andi
@@ -48,33 +52,38 @@ int instructionParse(uint32_t instruction, size_t index){
 		case 0x4: // beq
 			name = "beq";
 
-			branch_on_equal(rs, rt, immediate);
+			if(exe)
+				branch_on_equal(rs, rt, immediate);
 			break;
 
 		case 0x5: // bne
 			name = "bne";
 
-			branch_on_not_equal(rs, rt, immediate);
+			if (exe)
+				branch_on_not_equal(rs, rt, immediate);
 			break;
 
 		case 0x06: // blez
 			name = "blez";
 
-			branch_on_less_equal_zero(rs, immediate);
+			if(exe)
+				branch_on_less_equal_zero(rs, immediate);
 			break;
 
 		case 0x2: // j
 			name = "j";
 			format = 'J';
 
-			jump(address);
+			if(exe)
+				jump(address);
 			break;
 
 		case 0x3: // jal
 			name = "jal";
 			format = 'J';
 
-			jump_and_link(address);
+			if(exe)
+				jump_and_link(address);
 			break;
 
 		//case 0x24: // lbu
@@ -92,32 +101,37 @@ int instructionParse(uint32_t instruction, size_t index){
 		case 0xf: // lui
 			name = "lui";
 
-			load_upper_imm(rt, immediate);
+			if(exe)
+				load_upper_imm(rt, immediate);
 			break;
 
 		case 0x23: // lw
 			name = "lw";
 
-			load_word(rt, immediate, rs);
+			if(exe)
+				load_word(rt, immediate, rs);
 			break;
 
 		case 0x2B: // sw
 			name = "sw";
 
-			if(store_word(rt, immediate, rs))
+			if(exe)
+				if(store_word(rt, immediate, rs))
 				return 1;
 			break;
 
 		case 0xD: // ori
 			name = "ori";
 
-			or_imm(rt, rs, immediate);
+			if(exe)
+				or_imm(rt, rs, immediate);
 			break;
 
 		case 0xA: // slti
 			name = "slti";
 
-			set_less_than_imm(rt, rs, immediate);
+			if(exe)
+				set_less_than_imm(rt, rs, immediate);
 			break;
 
 		//case 0xB: // sltiu
@@ -148,7 +162,7 @@ int instructionParse(uint32_t instruction, size_t index){
 	return 0;
 }
 
-int RParse(uint32_t instruction){ 
+int RParse(uint32_t instruction, int exe){ 
 
 	uint32_t rs = getBitRange(instruction, 26, 21);
 	uint32_t rt = getBitRange(instruction, 21, 16);
@@ -161,13 +175,15 @@ int RParse(uint32_t instruction){
 		case 0x20: // add
 			name = "add";
 
-			add(rd,  rs,  rt);
+			if(exe)
+				add(rd,  rs,  rt);
 			break;
 
 		case 0x21: // addu
 			name = "addu";
 
-			add_unsigned(rd,  rs,  rt);
+			if(exe)
+				add_unsigned(rd,  rs,  rt);
 			break;
 
 		//case 0x24: // and
@@ -177,7 +193,8 @@ int RParse(uint32_t instruction){
 		case 0x08: // jr
 			name = "jr";
 
-			jump_register(rs);
+			if(exe)
+				jump_register(rs);
 			break;
 
 		//case 0x27: // nor
@@ -191,7 +208,8 @@ int RParse(uint32_t instruction){
 		case 0x2A: // slt
 			name = "slt";
 
-			set_less_than(rd,  rs,  rt);
+			if(exe)
+				set_less_than(rd,  rs,  rt);
 			break;
 
 		//case 0x2B: // sltu
@@ -201,7 +219,8 @@ int RParse(uint32_t instruction){
 		case 0x00: // sll
 			name = "sll";
 
-			shift_left_logical(rd,  rt,  shamt);
+			if(exe)
+				shift_left_logical(rd,  rt,  shamt);
 			break;
 
 		//case 0x02: // srl
@@ -211,7 +230,8 @@ int RParse(uint32_t instruction){
 		case 0x22: // sub
 			name = "sub";
 
-			sub(rd,  rs,  rt);
+			if(exe)
+				sub(rd,  rs,  rt);
 			break;
 
 		//case 0x23: // subu
@@ -221,13 +241,14 @@ int RParse(uint32_t instruction){
 		case 0x26: // xor
 			name = "xor";
 
-			xor(rd,  rs,  rt);
+			if(exe)
+				xor(rd,  rs,  rt);
 			break;
 
 		case 0xC: // syscall
 			name = "syscall";
 
-			if(mips_syscall())
+			if(exe && mips_syscall())
 				return 1;
 			break;
 
@@ -268,6 +289,8 @@ int printInstruction(uint32_t instruction, char format, char* name, size_t index
 				printf("%s $%s, %X", name, rt, (uint16_t) imm);
 			else if(opcode == 0x23 || opcode == 0x24 || opcode == 0x25 || opcode == 0x28 || opcode == 0x29 || opcode == 0x2b)
 				printf("%s $%s, %d($%s)", name, rt, imm , rs);
+			else if(opcode == 0x4 || opcode == 0x5)
+				printf("%s $%s, $%s, %d", name, rs, rt, imm);
 			else
 				printf("%s $%s, $%s, %d", name, rt, rs, imm);
 			break;

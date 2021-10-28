@@ -7,7 +7,7 @@
 int instructionParse(uint32_t instruction, size_t index);
 
 // For R type instructions, since the funct field is like it's own opcode type of thing
-int RParse(uint32_t instruction);
+int RParse(uint32_t instruction, int exe);
 
 void num2reg(int reg, char* buffer);
 

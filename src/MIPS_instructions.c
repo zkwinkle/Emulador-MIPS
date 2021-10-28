@@ -116,7 +116,7 @@ void jump(uint32_t address){
 }
 
 void jump_and_link(uint32_t address){
-	storeInRegister(31, pc*4 + 0x00400000 + 8);
+	storeInRegister(31, pc*4 + 0x00400000);
 	jump(address);
 }
 

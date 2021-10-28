@@ -30,6 +30,6 @@ void jumpToInstruction(uint32_t address){
 }
 
 void relativeJump(int16_t from_pc4){
-	pc = pc+1 + from_pc4;
+	pc = pc + from_pc4; // pc is already the current instruction + 1
 	fseek(textStream, pc*9, SEEK_SET);
 }

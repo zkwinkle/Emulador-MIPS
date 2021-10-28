@@ -147,7 +147,6 @@ int updateDisplay(SDL_Surface *screen) {
 	for(int i = 0; i<(SCREEN_WIDTH*SCREEN_HEIGHT/(8*8)); i++){ // pixels are 8x8
 		if(getFromHeap(i) == 0)
 			continue;
-		printf("AAAAA");
 		int x = 8*(i%64);
 		int y = 8*(i/64);
 		SDL_Rect src = instantiateRect(x, y, 8, 8);
