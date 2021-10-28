@@ -102,7 +102,8 @@ int instructionParse(uint32_t instruction, size_t index){
 		case 0x2B: // sw
 			name = "sw";
 
-			store_word(rt, immediate, rs);
+			if(store_word(rt, immediate, rs))
+				return 1;
 			break;
 
 		case 0xD: // ori
@@ -261,11 +262,11 @@ int printInstruction(uint32_t instruction, char format, char* name, size_t index
 			if(opcode == 0x06 || opcode == 0x07)
 				printf("%s $%s, %d", name, rs, imm);
 			else if(opcode == 0xf)
-				printf("%s $%s, %d", name, rt, imm);
+				printf("%s $%s, %X", name, rt, (uint16_t) imm);
 			else if(opcode == 0x23 || opcode == 0x24 || opcode == 0x25 || opcode == 0x28 || opcode == 0x29 || opcode == 0x2b)
 				printf("%s $%s, %d($%s)", name, rt, imm , rs);
 			else
-				printf("%s, $%s, $%s, %d", name, rs, rt, imm);
+				printf("%s $%s, $%s, %d", name, rt, rs, imm);
 			break;
 		case 'J':
 			printf("%s 0x%.8X", name, getBitRange(instruction, 26, 0)<<2); // shift left by 2 porque MIPS le corta los últimos 2 0s

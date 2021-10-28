@@ -27,7 +27,7 @@ void branch_on_less_equal_zero(uint32_t rs, uint16_t imm);
 void load_upper_imm(uint32_t rt, uint16_t imm);
 
 void load_word(uint32_t rt, uint16_t imm, uint32_t rs);
-void store_word(uint32_t rt, uint16_t imm, uint32_t rs);
+int store_word(uint32_t rt, uint16_t imm, uint32_t rs);
 
 void or_imm(uint32_t rt, uint32_t rs, uint16_t imm);
 void set_less_than_imm(uint32_t rt, uint32_t rs, uint16_t imm);

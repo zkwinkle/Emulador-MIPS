@@ -28,3 +28,8 @@ void jumpToInstruction(uint32_t address){
 	pc = (address - 0x00400000)/4;
 	fseek(textStream, pc*9, SEEK_SET); // *9 porque cada línea son 9 bytes (8 caracteres hex + \n)
 }
+
+void relativeJump(int16_t from_pc4){
+	pc = pc+1 + from_pc4;
+	fseek(textStream, pc*9, SEEK_SET);
+}

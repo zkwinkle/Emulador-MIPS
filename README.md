@@ -11,8 +11,8 @@ Para compilar el juego solo corra el comando `make` estando en la carpeta "root"
 Las memorias simuladas para correr el programa Pong son:
 
 - Banco de registros (32 direcciones)
-- Heap (1MB)
-- Stack (1MB)
+- Heap (32kB)
+- Stack (32kB)
 - Static Data (4kB)
 - MMIO (4 direcciones)
 - Text (Archivo de texto)

@@ -14,5 +14,6 @@ void closeText();
 
 int readNextInstruction();
 void jumpToInstruction(uint32_t address);
+void relativeJump(int16_t from_pc4);
 
 #endif

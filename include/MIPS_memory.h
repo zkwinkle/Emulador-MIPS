@@ -19,4 +19,8 @@ void storeInRegister(int reg, uint32_t word);
 
 uint32_t getFromRegister(int reg);
 
+int storeInMemory(uint32_t address, uint32_t word);
+
+uint32_t getFromMemory(uint32_t address);
+
 #endif
