@@ -14,7 +14,7 @@ void sub(uint32_t rd, uint32_t rs, uint32_t rt);
 void xor(uint32_t rd, uint32_t rs, uint32_t rt);
 
 // syscall
-void syscall();
+int mips_syscall();
 
 // I type instructions
 void add_imm(uint32_t rt, uint32_t rs, uint16_t imm);

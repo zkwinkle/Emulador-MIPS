@@ -1,6 +1,7 @@
 #include "MIPS_parser.h"
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "bit_manipulation.h"
 #include "MIPS_instructions.h"
@@ -9,6 +10,7 @@ static char* name; // for printing function names
 
 // parsing instructions
 int instructionParse(uint32_t instruction, size_t index){
+	//usleep(20000); // pause for 20ms for better visualization
 	char format = 'I'; // I, R or J
 
 	uint32_t opcode = getBitRange(instruction, 32, 26);
@@ -225,7 +227,8 @@ int RParse(uint32_t instruction){
 		case 0xC: // syscall
 			name = "syscall";
 
-			syscall();
+			if(mips_syscall())
+				return 1;
 			break;
 
 		default:

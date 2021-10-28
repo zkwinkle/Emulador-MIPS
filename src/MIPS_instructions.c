@@ -1,5 +1,7 @@
 #include "MIPS_instructions.h"
 
+#include <unistd.h>
+
 #include "MIPS_memory.h"
 #include "text_manager.h"
 #include "bit_manipulation.h"
@@ -35,8 +37,24 @@ void xor(uint32_t rd, uint32_t rs, uint32_t rt){
 
 
 // syscall
-void syscall(){
-	// complicated >.<
+int mips_syscall(){
+	int service = getFromRegister(2); // load service number from $v0
+	if(service == 31){
+		// MIDI out, probs do this last
+		;
+	}
+	else if(service == 32){
+		// sleep for $a0 milliseconds
+		printf("sleeping for %X\n" , getFromRegister(4));
+		size_t millis = getFromRegister(4);
+		usleep(millis*1000);
+	}
+	else{
+		printf("syscall %d unrecognized\n", service);
+		return 1;
+	}
+	return 0;
+
 }
 
 
