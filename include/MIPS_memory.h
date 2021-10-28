@@ -2,6 +2,7 @@
 #define MIPSMEMORY_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 static uint32_t *RB; // Register bank
 static uint32_t *data; // static data
@@ -22,5 +23,7 @@ uint32_t getFromRegister(int reg);
 int storeInMemory(uint32_t address, uint32_t word);
 
 uint32_t getFromMemory(uint32_t address);
+
+uint32_t getFromHeap(size_t index);
 
 #endif

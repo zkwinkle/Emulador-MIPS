@@ -75,6 +75,7 @@ int storeInMemory(uint32_t address, uint32_t word){
 	}
 	else if(address >= 0x10008000 && address < 0x1000ffff){
 		uint32_t realAddress = (address-0x10008000)/4;
+		printf("saving in heap!! index %d value %X\n", realAddress, word);
 		heap[realAddress] = word;
 	}
 	else if(address >= 0x10010000 && address < 0x10010fa0){
@@ -117,4 +118,8 @@ uint32_t getFromMemory(uint32_t address){
 		printf("Address '%X' is outside the given ranges for the types of memory and the emulator can't deal with it (inside getFromMemory function)\n", address);
 		return -1;
 	}
+}
+
+uint32_t getFromHeap(size_t index){
+	return heap[index];
 }

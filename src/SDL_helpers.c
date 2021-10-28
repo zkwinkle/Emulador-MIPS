@@ -8,4 +8,3 @@ SDL_Rect instantiateRect(int x, int y, int w, int h){
 	rect.h=h;
 	return rect;
 }
-
