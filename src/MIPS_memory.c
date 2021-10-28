@@ -43,7 +43,7 @@ void free_memory(){
 	free(MMIO);
 }
 
-void storeInRegister(uint32_t word, int reg){
+void storeInRegister(int reg, uint32_t word){
 	if(reg == 0)
 		return;
 	RB[reg] = word;

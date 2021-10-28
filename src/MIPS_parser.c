@@ -2,14 +2,20 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <bit_manipulation.h>
+#include "bit_manipulation.h"
+#include "MIPS_instructions.h"
 
 static char* name; // for printing function names
 
 // parsing instructions
 int instructionParse(uint32_t instruction, size_t index){
-	uint32_t opcode = getBitRange(instruction, 32, 26);
 	char format = 'I'; // I, R or J
+
+	uint32_t opcode = getBitRange(instruction, 32, 26);
+	uint32_t rs = getBitRange(instruction, 26, 21);
+	uint32_t rt = getBitRange(instruction, 21, 16);
+	uint16_t immediate = getBitRange(instruction, 16, 0);
+	uint32_t address = getBitRange(instruction, 26, 0);
 	
 	//instrucciones comentadas no se utilizan para códigon de pong
 	switch(opcode){
@@ -23,10 +29,14 @@ int instructionParse(uint32_t instruction, size_t index){
 
 		case 0x8: // addi
 			name = "addi";
+
+			add_imm(rt, rs, immediate);
 			break;
 
 		case 0x9: // addiu
 			name = "addiu";
+
+			add_imm_unsigned(rt, rs, immediate);
 			break;
 
 		//case 0xC: // andi
@@ -35,20 +45,34 @@ int instructionParse(uint32_t instruction, size_t index){
 
 		case 0x4: // beq
 			name = "beq";
+
+			branch_on_equal(rs, rt, immediate);
 			break;
 
 		case 0x5: // bne
 			name = "bne";
+
+			branch_on_not_equal(rs, rt, immediate);
+			break;
+
+		case 0x06: // blez
+			name = "blez";
+
+			branch_on_less_equal_zero(rs, immediate);
 			break;
 
 		case 0x2: // j
 			name = "j";
 			format = 'J';
+
+			jump(address);
 			break;
 
 		case 0x3: // jal
 			name = "jal";
 			format = 'J';
+
+			jump_and_link(address);
 			break;
 
 		//case 0x24: // lbu
@@ -65,18 +89,32 @@ int instructionParse(uint32_t instruction, size_t index){
 
 		case 0xf: // lui
 			name = "lui";
+
+			load_upper_imm(rt, immediate);
 			break;
 
 		case 0x23: // lw
 			name = "lw";
+
+			load_word(rt, immediate, rs);
+			break;
+
+		case 0x2B: // sw
+			name = "sw";
+
+			store_word(rt, immediate, rs);
 			break;
 
 		case 0xD: // ori
 			name = "ori";
+
+			or_imm(rt, rs, immediate);
 			break;
 
 		case 0xA: // slti
 			name = "slti";
+
+			set_less_than_imm(rt, rs, immediate);
 			break;
 
 		//case 0xB: // sltiu
@@ -95,14 +133,6 @@ int instructionParse(uint32_t instruction, size_t index){
 		//	name = "sh";
 		//	break;
 
-		case 0x2B: // sw
-			name = "sw";
-			break;
-
-		case 0x06: // blez
-			name = "blez";
-			break;
-
 		//case 0x07: // bgtz
 		//	name = "bgtz";
 		//	break;
@@ -116,16 +146,25 @@ int instructionParse(uint32_t instruction, size_t index){
 }
 
 int RParse(uint32_t instruction){ 
+
+	uint32_t rs = getBitRange(instruction, 26, 21);
+	uint32_t rt = getBitRange(instruction, 21, 16);
+	uint32_t rd = getBitRange(instruction, 16, 11);
+	uint32_t shamt = getBitRange(instruction, 10, 6);
 	uint32_t funct = getBitRange(instruction, 6, 0);
 
 	// Los functs comentados no se utilizan en Pong
 	switch(funct){
 		case 0x20: // add
 			name = "add";
+
+			add(rd,  rs,  rt);
 			break;
 
 		case 0x21: // addu
 			name = "addu";
+
+			add_unsigned(rd,  rs,  rt);
 			break;
 
 		//case 0x24: // and
@@ -134,6 +173,8 @@ int RParse(uint32_t instruction){
 
 		case 0x08: // jr
 			name = "jr";
+
+			jump_register(rs);
 			break;
 
 		//case 0x27: // nor
@@ -146,6 +187,8 @@ int RParse(uint32_t instruction){
 
 		case 0x2A: // slt
 			name = "slt";
+
+			set_less_than(rd,  rs,  rt);
 			break;
 
 		//case 0x2B: // sltu
@@ -154,6 +197,8 @@ int RParse(uint32_t instruction){
 
 		case 0x00: // sll
 			name = "sll";
+
+			shift_left_logical(rd,  rt,  shamt);
 			break;
 
 		//case 0x02: // srl
@@ -162,6 +207,8 @@ int RParse(uint32_t instruction){
 
 		case 0x22: // sub
 			name = "sub";
+
+			sub(rd,  rs,  rt);
 			break;
 
 		//case 0x23: // subu
@@ -170,10 +217,14 @@ int RParse(uint32_t instruction){
 		
 		case 0x26: // xor
 			name = "xor";
+
+			xor(rd,  rs,  rt);
 			break;
 
 		case 0xC: // syscall
 			name = "syscall";
+
+			syscall();
 			break;
 
 		default:

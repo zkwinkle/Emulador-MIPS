@@ -15,7 +15,7 @@ void load_data(); // helper function to load static data during init
 
 void free_memory();
 
-void storeInRegister(uint32_t word, int reg);
+void storeInRegister(int reg, uint32_t word);
 
 uint32_t getFromRegister(int reg);
 
