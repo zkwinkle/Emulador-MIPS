@@ -89,7 +89,7 @@ int storeInMemory(uint32_t address, uint32_t word){
 		MMIO[realAddress] = word;
 	}
 	else{
-		printf("Address '%X' is outside the given ranges for the types of memory and the emulator can't deal with it (inside storeInMemory function)\n", address);
+		printf("Address '%X' is outside the given ranges for the types of memory and the emulator can't deal with it (inside storeInMemory function) (current $gp: %X) \n", address, RB[28]);
 		return 1;
 	}
 	return 0;
@@ -114,6 +114,9 @@ uint32_t getFromMemory(uint32_t address){
 	}
 	else if(address >= 0xffff0000 && address < 0xffff0010){
 		uint32_t realAddress = (address-0xffff0000)/4;
+		if(realAddress == 1){
+			MMIO[0] = 0; // ready bit resets to 0 automatically when character is read
+		}
 		return MMIO[realAddress];
 	}
 	else{
@@ -124,4 +127,9 @@ uint32_t getFromMemory(uint32_t address){
 
 uint32_t getFromHeap(size_t index){
 	return heap[index];
+}
+
+int write_key_MMIO(uint32_t ascii){
+	MMIO[0] = 1;
+	MMIO[1] = ascii;
 }

@@ -13,7 +13,10 @@ int instructionParse(uint32_t instruction, size_t index){
 	//usleep(20000); // pause for 20ms for better visualization
 	char format = 'I'; // I, R or J
 
-	int exe = 1;
+	// this flag decides whether to execute the instructions or just print the instructions read
+	int exe = 1; // 1 = execute instructions, 0 = just print them all in a row
+
+	int error = 0; // Some of the calls can return error codes, this flag will get flipped and the function will return an error code at the end
 
 	uint32_t opcode = getBitRange(instruction, 32, 26);
 	uint32_t rs = getBitRange(instruction, 26, 21);
@@ -27,7 +30,7 @@ int instructionParse(uint32_t instruction, size_t index){
 			format = 'R';
 			if(RParse(instruction, exe)){
 				printf("funct '%X' de instrucción tipo R no reconocido en línea %d",getBitRange(instruction, 6, 0), index);
-				return 1;
+				error=1;
 			}
 			break;
 
@@ -117,7 +120,7 @@ int instructionParse(uint32_t instruction, size_t index){
 
 			if(exe)
 				if(store_word(rt, immediate, rs))
-				return 1;
+				error=1;
 			break;
 
 		case 0xD: // ori
@@ -156,9 +159,11 @@ int instructionParse(uint32_t instruction, size_t index){
 
 		default:
 			printf("opcode '%X' no reconocido en línea %d\nInstrucción: %X\n",opcode, index, instruction);
-			return 1;
+			error=1;
 	}
 	printInstruction(instruction, format, name, index);
+	if(error)
+		return 1;
 	return 0;
 }
 

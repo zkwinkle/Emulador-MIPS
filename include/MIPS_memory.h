@@ -26,4 +26,6 @@ uint32_t getFromMemory(uint32_t address);
 
 uint32_t getFromHeap(size_t index);
 
+int write_key_MMIO(uint32_t ascii);
+
 #endif

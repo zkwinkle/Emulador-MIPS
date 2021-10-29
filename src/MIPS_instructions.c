@@ -12,6 +12,7 @@ void add(uint32_t rd, uint32_t rs, uint32_t rt){
 }
 
 void add_unsigned(uint32_t rd, uint32_t rs, uint32_t rt){
+	//printf("rd '%X' rs '%X' rt '%X'\n", getFromRegister(rd), getFromRegister(rs), getFromRegister(rt));
 	storeInRegister(rd, getFromRegister(rs) + getFromRegister(rt));
 }
 
@@ -24,6 +25,7 @@ void set_less_than(uint32_t rd, uint32_t rs, uint32_t rt){
 }
 
 void shift_left_logical(uint32_t rd, uint32_t rt, uint32_t shamt){
+	//printf("sll shifts %d for result: %X\n", shamt, getFromRegister(rt) << shamt);
 	storeInRegister(rd, getFromRegister(rt) << shamt);
 }
 
@@ -32,6 +34,7 @@ void sub(uint32_t rd, uint32_t rs, uint32_t rt){
 }
 
 void xor(uint32_t rd, uint32_t rs, uint32_t rt){
+	//printf("xor between '%X' and '%X'\n", getFromRegister(rs), getFromRegister(rt));
 	storeInRegister(rd, getFromRegister(rs) ^ getFromRegister(rt));
 }
 
@@ -45,12 +48,12 @@ int mips_syscall(){
 	}
 	else if(service == 32){
 		// sleep for $a0 milliseconds
-		printf("sleeping for %X\n" , getFromRegister(4));
+		//printf("sleeping for %X\n" , getFromRegister(4));
 		size_t millis = getFromRegister(4);
 		usleep(millis*1000);
 	}
 	else{
-		printf("syscall %d unrecognized\n", service);
+		//printf("syscall %d unrecognized\n", service);
 		return 1;
 	}
 	return 0;
@@ -64,7 +67,7 @@ void add_imm(uint32_t rt, uint32_t rs, uint16_t imm){
 }
 
 void add_imm_unsigned(uint32_t rt, uint32_t rs, uint16_t imm){
-	storeInRegister(rt, getFromRegister(rs) + (uint32_t)  imm);
+	storeInRegister(rt, getFromRegister(rs) + ((uint32_t)  (int16_t) imm) );
 }
 
 
@@ -92,10 +95,12 @@ void load_upper_imm(uint32_t rt, uint16_t imm){
 
 
 void load_word(uint32_t rt, uint16_t imm, uint32_t rs){
+	//printf("word '%X' \n", getFromMemory(getFromRegister(rs) + (int16_t) imm));
 	storeInRegister(rt, getFromMemory(getFromRegister(rs) + (int16_t) imm));
 }
 
 int store_word(uint32_t rt, uint16_t imm, uint32_t rs){
+	//printf("sw in address '%X' the word '%X'\n", getFromRegister(rs) + (int16_t) imm, getFromRegister(rt));
 	return storeInMemory(getFromRegister(rs) + (int16_t) imm, getFromRegister(rt));
 }
 

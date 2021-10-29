@@ -94,6 +94,7 @@ int main (int argc, char *args[]) {
 
 void *renderLoop(){
 	int sleep = 0;
+	SDL_Event event; // event variable
 	Uint32 next_game_tick = SDL_GetTicks();
 
 	while(getQuit() == 0) {
@@ -110,7 +111,17 @@ void *renderLoop(){
 			setQuit(1);
 
 		else{
-			;	
+			while( SDL_PollEvent( &event ) ){
+				/* We are only worried about SDL_KEYDOWN and SDL_KEYUP events */
+				switch( event.type ){
+					case SDL_KEYDOWN:
+						SDL_KeyboardEvent *kevent = &event.key;
+						write_key_MMIO(event.key.keysym.sym);
+						break;
+					default:
+						break;
+				}
+			}
 			// Aquí ocupo escribir las teclas que se escriben en memoria en el lugar correcto
 			//// player movement
 			//if (keystate[SDL_SCANCODE_DOWN]) 
@@ -145,12 +156,17 @@ void *renderLoop(){
 int updateDisplay(SDL_Surface *screen) {
 
 	for(int i = 0; i<(SCREEN_WIDTH*SCREEN_HEIGHT/(8*8)); i++){ // pixels are 8x8
-		if(getFromHeap(i) == 0)
-			continue;
+		//if(getFromHeap(i) == 0)
+		//	continue;
+		// position
 		int x = 8*(i%64);
 		int y = 8*(i/64);
-		SDL_Rect src = instantiateRect(x, y, 8, 8);
-		int r = SDL_FillRect(screen , &src, SDL_MapRGB(screen->format, 28, 87, 254));
+		SDL_Rect src = instantiateRect(x, y, 8, 8); // 8x8 pixels
+		// colors
+		uint32_t red	= getBitRange(getFromHeap(i), 24, 16);
+		uint32_t green	= getBitRange(getFromHeap(i), 16, 8);
+		uint32_t blue	= getBitRange(getFromHeap(i), 8, 0);
+		int r = SDL_FillRect(screen , &src, SDL_MapRGB(screen->format, red, green, blue));
 
 		if (r !=0){
 			printf("Fill rectangle failed during updateDisaply() iteration #%d\n", i);
