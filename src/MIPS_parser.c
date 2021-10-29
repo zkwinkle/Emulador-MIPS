@@ -48,9 +48,11 @@ int instructionParse(uint32_t instruction, size_t index){
 				add_imm_unsigned(rt, rs, immediate);
 			break;
 
-		//case 0xC: // andi
-		//	name = "andi";
-		//	break;
+		case 0xC: // andi
+			name = "andi";
+			if(exe)
+				and_imm(rt, rs, immediate);
+			break;
 
 		case 0x4: // beq
 			name = "beq";
@@ -73,6 +75,13 @@ int instructionParse(uint32_t instruction, size_t index){
 				branch_on_less_equal_zero(rs, immediate);
 			break;
 
+		case 0x07: // bgtz
+			name = "bgtz";
+
+			if(exe)
+				branch_on_greater_equal_zero(rs, immediate);
+			break;
+
 		case 0x2: // j
 			name = "j";
 			format = 'J';
@@ -89,17 +98,23 @@ int instructionParse(uint32_t instruction, size_t index){
 				jump_and_link(address);
 			break;
 
-		//case 0x24: // lbu
-		//	name = "lbu";
-		//	break;
+		case 0x24: // lbu
+			name = "lbu";
 
-		//case 0x25: // lhu
-		//	name = "lhu";
-		//	break;
+			if(exe)
+				load_byte_unsigned(rt, immediate, rs);
+			break;
 
-		////case 0x30: // ll
-		////	name = "ll";
-		////	break;
+		case 0x25: // lhu
+			name = "lhu";
+
+			if(exe)
+				load_halfword_unsigned(rt, immediate, rs);
+			break;
+
+		//case 0x30: // ll
+		//	name = "ll";
+		//	break;
 
 		case 0xf: // lui
 			name = "lui";
@@ -120,7 +135,7 @@ int instructionParse(uint32_t instruction, size_t index){
 
 			if(exe)
 				if(store_word(rt, immediate, rs))
-				error=1;
+					error=1;
 			break;
 
 		case 0xD: // ori
@@ -137,25 +152,32 @@ int instructionParse(uint32_t instruction, size_t index){
 				set_less_than_imm(rt, rs, immediate);
 			break;
 
-		//case 0xB: // sltiu
-		//	name = "sltiu";
+		case 0xB: // sltiu
+			name = "sltiu";
+
+			if(exe)
+				set_less_than_imm_unsigned(rt, rs, immediate);
+			break;
+
+		case 0x28: // sb
+			name = "sb";
+
+			if(exe)
+				if(store_byte(rt, immediate, rs))
+					error=1;
+
+			break;
+
+		//case 0x38: // sc
+		//	name = "sc";
 		//	break;
 
-		//case 0x28: // sb
-		//	name = "sb";
-		//	break;
-
-		////case 0x38: // sc
-		////	name = "sc";
-		////	break;
-
-		//case 0x29: // sh
-		//	name = "sh";
-		//	break;
-
-		//case 0x07: // bgtz
-		//	name = "bgtz";
-		//	break;
+		case 0x29: // sh
+			name = "sh";
+			if(exe)
+				if(store_halfword(rt, immediate, rs))
+					error=1;
+			break;
 
 		default:
 			printf("opcode '%X' no reconocido en línea %d\nInstrucción: %X\n",opcode, index, instruction);
@@ -191,9 +213,12 @@ int RParse(uint32_t instruction, int exe){
 				add_unsigned(rd,  rs,  rt);
 			break;
 
-		//case 0x24: // and
-		//	name = "and";
-		//	break;
+		case 0x24: // and
+			name = "and";
+
+			if(exe)
+				and(rd, rs, rt);
+			break;
 
 		case 0x08: // jr
 			name = "jr";
@@ -202,13 +227,18 @@ int RParse(uint32_t instruction, int exe){
 				jump_register(rs);
 			break;
 
-		//case 0x27: // nor
-		//	name = "nor";
-		//	break;
+		case 0x27: // nor
+			name = "nor";
+			
+			if(exe)
+				nor(rd,  rs,  rt);
+			break;
 
-		//case 0x25: // or
-		//	name = "or";
-		//	break;
+		case 0x25: // or
+			name = "or";
+			if(exe)
+				or(rd,  rs,  rt);
+			break;
 
 		case 0x2A: // slt
 			name = "slt";
@@ -217,9 +247,11 @@ int RParse(uint32_t instruction, int exe){
 				set_less_than(rd,  rs,  rt);
 			break;
 
-		//case 0x2B: // sltu
-		//	name = "sltu";
-		//	break;
+		case 0x2B: // sltu
+			name = "sltu";
+			if(exe)
+				set_less_than_unsigned(rd,  rs,  rt);
+			break;
 
 		case 0x00: // sll
 			name = "sll";
@@ -228,9 +260,11 @@ int RParse(uint32_t instruction, int exe){
 				shift_left_logical(rd,  rt,  shamt);
 			break;
 
-		//case 0x02: // srl
-		//	name = "srl";
-		//	break;
+		case 0x02: // srl
+			name = "srl";
+			if(exe)
+				shift_right_logical(rd,  rt,  shamt);
+			break;
 
 		case 0x22: // sub
 			name = "sub";
@@ -239,9 +273,11 @@ int RParse(uint32_t instruction, int exe){
 				sub(rd,  rs,  rt);
 			break;
 
-		//case 0x23: // subu
-		//	name = "subu";
-		//	break;
+		case 0x23: // subu
+			name = "subu";
+			if(exe)
+				sub_unsigned(rd,  rs,  rt);
+			break;
 		
 		case 0x26: // xor
 			name = "xor";

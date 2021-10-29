@@ -24,13 +24,29 @@ void set_less_than(uint32_t rd, uint32_t rs, uint32_t rt){
 	storeInRegister(rd, (uint32_t) ((int32_t) getFromRegister(rs) < (int32_t) getFromRegister(rt)) );
 }
 
+void set_less_than_unsigned(uint32_t rd, uint32_t rs, uint32_t rt){
+	storeInRegister(rd, (uint32_t) ((uint32_t) getFromRegister(rs) < (uint32_t) getFromRegister(rt)) );
+}
+
 void shift_left_logical(uint32_t rd, uint32_t rt, uint32_t shamt){
 	//printf("sll shifts %d for result: %X\n", shamt, getFromRegister(rt) << shamt);
 	storeInRegister(rd, getFromRegister(rt) << shamt);
 }
 
+void shift_right_logical(uint32_t rd, uint32_t rt, uint32_t shamt){
+	storeInRegister(rd, getFromRegister(rt) >> shamt);
+}
+
+void sub_unsigned(uint32_t rd, uint32_t rs, uint32_t rt){
+	storeInRegister(rd, (uint32_t) getFromRegister(rs) - (uint32_t) getFromRegister(rt));
+}
+
 void sub(uint32_t rd, uint32_t rs, uint32_t rt){
 	storeInRegister(rd, (int32_t) getFromRegister(rs) - (int32_t) getFromRegister(rt));
+}
+
+void and(uint32_t rd, uint32_t rs, uint32_t rt){
+	storeInRegister(rd, getFromRegister(rs) & getFromRegister(rt));
 }
 
 void xor(uint32_t rd, uint32_t rs, uint32_t rt){
@@ -38,6 +54,13 @@ void xor(uint32_t rd, uint32_t rs, uint32_t rt){
 	storeInRegister(rd, getFromRegister(rs) ^ getFromRegister(rt));
 }
 
+void nor(uint32_t rd, uint32_t rs, uint32_t rt){
+	storeInRegister(rd, ~(getFromRegister(rs) | getFromRegister(rt)));
+}
+
+void or(uint32_t rd, uint32_t rs, uint32_t rt){
+	storeInRegister(rd, getFromRegister(rs) | getFromRegister(rt));
+}
 
 // syscall
 int mips_syscall(){
@@ -70,7 +93,6 @@ void add_imm_unsigned(uint32_t rt, uint32_t rs, uint16_t imm){
 	storeInRegister(rt, getFromRegister(rs) + ((uint32_t)  (int16_t) imm) );
 }
 
-
 void branch_on_equal(uint32_t rs, uint32_t rt, uint16_t imm){
 	if(getFromRegister(rs) == getFromRegister(rt)){
 		relativeJump((int16_t) imm);
@@ -87,6 +109,11 @@ void branch_on_less_equal_zero(uint32_t rs, uint16_t imm){
 		relativeJump((int16_t) imm);
 }
 
+void branch_on_greater_equal_zero(uint32_t rs, uint16_t imm){
+	if(getFromRegister(rs) >= 0)
+		relativeJump((int16_t) imm);
+}
+
 
 void load_upper_imm(uint32_t rt, uint16_t imm){
 	uint32_t upper_imm = (uint32_t) imm << 16;
@@ -99,11 +126,52 @@ void load_word(uint32_t rt, uint16_t imm, uint32_t rs){
 	storeInRegister(rt, getFromMemory(getFromRegister(rs) + (int16_t) imm));
 }
 
+void load_byte(uint32_t rt, uint16_t imm, uint32_t rs){
+	storeInRegister(rt, ( (int32_t) (int8_t) getBitRange(getFromMemory(getFromRegister(rs) + (int16_t) imm), 24, 0) ) );
+}
+
+void load_halfword(uint32_t rt, uint16_t imm, uint32_t rs){
+	storeInRegister(rt, ( (int32_t) (int8_t) getBitRange(getFromMemory(getFromRegister(rs) + (int16_t) imm), 16, 0) ) );
+}
+
+void load_byte_unsigned(uint32_t rt, uint16_t imm, uint32_t rs){
+	storeInRegister(rt, getBitRange(getFromMemory(getFromRegister(rs) + (int16_t) imm), 24, 0) );
+}
+
+void load_halfword_unsigned(uint32_t rt, uint16_t imm, uint32_t rs){
+	storeInRegister(rt, getBitRange(getFromMemory(getFromRegister(rs) + (int16_t) imm), 16, 0) );
+}
+
 int store_word(uint32_t rt, uint16_t imm, uint32_t rs){
 	//printf("sw in address '%X' the word '%X'\n", getFromRegister(rs) + (int16_t) imm, getFromRegister(rt));
 	return storeInMemory(getFromRegister(rs) + (int16_t) imm, getFromRegister(rt));
 }
 
+int store_halfword(uint32_t rt, uint16_t imm, uint32_t rs){
+	uint32_t address = getFromRegister(rs) + (int16_t) imm;
+	int which = (address/2)%2; // 0 = top half, 1 = bottom half
+
+	uint32_t word = getFromRegister(address-2*which);
+
+	word = substituteHalfword(word, getBitRange(getFromRegister(rt), 16, 0), which);
+
+	return storeInMemory(address-2*which, word);
+}
+
+int store_byte(uint32_t rt, uint16_t imm, uint32_t rs){
+	uint32_t address = getFromRegister(rs) + (int16_t) imm;
+	int which = address%4; // 0 = first byte, ..., 3 = last byte
+
+	uint32_t word = getFromRegister(address-4*which);
+
+	word = substituteByte(word, getBitRange(getFromRegister(rt), 8, 0), which);
+
+	return storeInMemory(address-4*which, word);
+}
+
+void and_imm(uint32_t rt, uint32_t rs, uint16_t imm){
+	storeInRegister(rt, getFromRegister(rs) & imm);
+}
 
 void or_imm(uint32_t rt, uint32_t rs, uint16_t imm){
 	storeInRegister(rt, getFromRegister(rs) | imm);
@@ -113,6 +181,9 @@ void set_less_than_imm(uint32_t rt, uint32_t rs, uint16_t imm){
 	storeInRegister(rt, (uint32_t) ((int32_t) getFromRegister(rs) < (int16_t) imm) );
 }
 
+void set_less_than_imm_unsigned(uint32_t rt, uint32_t rs, uint16_t imm){
+	storeInRegister(rt, (uint32_t) ((uint32_t) getFromRegister(rs) < (uint16_t) imm) );
+}
 
 // J type instructions
 void jump(uint32_t address){
