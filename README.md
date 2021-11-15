@@ -1,8 +1,11 @@
 # Emulador MIPS
-Este es un proyecto con el propósito de realizar un emulador (incompleto) de la arquitectura MIPS capaz de emular el proyecto [MIPS-PONG](https://github.com/AndrewHamm/MIPS-Pong). Está realizado en C y utiliza la librería SDL para crear el bitmap display.
+Este es un proyecto con el propósito de realizar un emulador (incompleto) de la arquitectura MIPS capaz de emular los proyectos [Wizard of Wor-ASM](https://github.com/zkwinkle/Wizard-of-Wor-ASM) o [MIPS-PONG](https://github.com/AndrewHamm/MIPS-Pong). Está realizado en C y utiliza la librería SDL para crear el bitmap display.
 
 ## Instrucciones de uso
-Para compilar el juego solo corra el comando `make` estando en la carpeta "root" del proyecto. Luego para ejecutar el simulador de Pong en ensamblador solo corra `./mips`. Para salir de la aplicación presione la tecla 'Esc'.
+Para compilar el juego solo corra el comando `make` estando en la carpeta "root" del proyecto. Luego para ejecutar el simulador de solo corra `./mips`. Para salir de la aplicación presione la tecla 'Esc'.
+
+Para escoger cuál juego correr por default está cargado Wizard of Wor, pero si desea correr Pong solo debe cambiarle el nombre a los archivos 'data.hex' y 'text.hex' a alguna otra cosa y luego quitarle el sufijo de 'pong_' a los archivos 'pong_data.hex' y 'pong_text.hex'.
+El simulador solo sabe que debe de buscar los archivos 'data.hex' y 'text.hex'.
 
 ## Datos técnicos
 
