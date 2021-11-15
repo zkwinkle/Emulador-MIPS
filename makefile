@@ -17,6 +17,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 #$(info $$OBJ/%.o is [${OBJ}])
 
 $(ODIR)/%.o: $(SRCDIR)/%.c $(DEPS)
+	@mkdir -p $(@D)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 mips: $(OBJ)
@@ -25,4 +26,5 @@ mips: $(OBJ)
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ 
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ mips
+	rmdir $(ODIR)
