@@ -79,7 +79,7 @@ int instructionParse(uint32_t instruction, size_t index){
 			name = "bgtz";
 
 			if(exe)
-				branch_on_greater_equal_zero(rs, immediate);
+				branch_on_greater_than_zero(rs, immediate);
 			break;
 
 		case 0x2: // j
@@ -145,6 +145,13 @@ int instructionParse(uint32_t instruction, size_t index){
 				or_imm(rt, rs, immediate);
 			break;
 
+		case 0xE: // xori
+			name = "xori";
+
+			if(exe)
+				xor_imm(rt, rs, immediate);
+			break;
+
 		case 0xA: // slti
 			name = "slti";
 
@@ -183,6 +190,7 @@ int instructionParse(uint32_t instruction, size_t index){
 			printf("opcode '%X' no reconocido en línea %d\nInstrucción: %X\n",opcode, index, instruction);
 			error=1;
 	}
+
 	printInstruction(instruction, format, name, index);
 	if(error)
 		return 1;

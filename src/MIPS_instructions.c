@@ -1,6 +1,8 @@
 #include "MIPS_instructions.h"
 
 #include <unistd.h>
+#include <time.h>
+#include <stdlib.h>
 
 #include "MIPS_memory.h"
 #include "text_manager.h"
@@ -62,6 +64,10 @@ void or(uint32_t rd, uint32_t rs, uint32_t rt){
 	storeInRegister(rd, getFromRegister(rs) | getFromRegister(rt));
 }
 
+// generate random num in range, lower bound inclusive, upper bound exclusive
+int rrand(int upper){
+	return rand()%upper;
+}
 // syscall
 int mips_syscall(){
 	int service = getFromRegister(2); // load service number from $v0
@@ -69,11 +75,30 @@ int mips_syscall(){
 		// MIDI out, probs do this last
 		;
 	}
+	else if(service == 30){
+		// should be time in ms but instead we just get it in seconds
+		uint64_t secs = time(0);
+		uint32_t lower = secs;
+		uint32_t higher = secs>>32;
+		storeInRegister(4, lower);
+		storeInRegister(5, higher);
+	}
 	else if(service == 32){
 		// sleep for $a0 milliseconds
 		//printf("sleeping for %X\n" , getFromRegister(4));
 		size_t millis = getFromRegister(4);
 		usleep(millis*1000);
+	}
+	else if(service == 40){
+		// should set seed and keep track of it with an id somehow, instead we just set a global seed
+		uint32_t seed = getFromRegister(5);
+		srand(seed);
+	}
+	else if(service == 42){
+		// random int range
+		uint32_t upper = getFromRegister(5);
+		uint32_t randint = rrand(upper);
+		storeInRegister(4, randint);
 	}
 	else{
 		//printf("syscall %d unrecognized\n", service);
@@ -109,8 +134,8 @@ void branch_on_less_equal_zero(uint32_t rs, uint16_t imm){
 		relativeJump((int16_t) imm);
 }
 
-void branch_on_greater_equal_zero(uint32_t rs, uint16_t imm){
-	if(getFromRegister(rs) >= 0)
+void branch_on_greater_than_zero(uint32_t rs, uint16_t imm){
+	if(getFromRegister(rs) > 0)
 		relativeJump((int16_t) imm);
 }
 
@@ -175,6 +200,10 @@ void and_imm(uint32_t rt, uint32_t rs, uint16_t imm){
 
 void or_imm(uint32_t rt, uint32_t rs, uint16_t imm){
 	storeInRegister(rt, getFromRegister(rs) | imm);
+}
+
+void xor_imm(uint32_t rt, uint32_t rs, uint16_t imm){
+	storeInRegister(rt, getFromRegister(rs) ^ imm);
 }
 
 void set_less_than_imm(uint32_t rt, uint32_t rs, uint16_t imm){
